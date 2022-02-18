@@ -4,7 +4,7 @@
   "description": "A (hopefully) quicker way to stand up a Javascript creative coding environment",
   "main": "index.js",
   "scripts": {
-    "start": "vite",
+    "dev": "vite",
     "build": "vite build",
     "clean": "rm -rf node_modules"
   },
