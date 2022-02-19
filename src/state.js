@@ -1,4 +1,5 @@
 import { createStore } from "redux";
+import { LUTCubeLoader } from "three/examples/jsm/loaders/LUTCubeLoader";
 import { ImageSampler } from "../snod/sampler";
 import { randomImage } from "./lib/images";
 import { random } from "canvas-sketch-util";
@@ -7,6 +8,8 @@ import {
   tessNameToOption,
   buildRandomTessStack,
 } from "./lib/tesses";
+
+import lutUrl from "/assets/luts/Everyday_Pro_Color.cube?url";
 
 function randomState() {
   let willStroke = random.chance(0.2);
@@ -85,9 +88,27 @@ function replaceSamplerFromUrl(url, store) {
   });
 }
 
+function loadLUT(callback) {
+  let url = lutUrl;
+  new LUTCubeLoader().load(url, (lut) => {
+    callback(lut);
+  });
+}
+
 function createApp() {
   let store = createStore(appReducer);
+
   replaceSamplerFromUrl(randomImage(), store);
+
+  setTimeout(() => {
+    loadLUT((lut) => {
+      store.dispatch({
+        type: AppActions.UpdateParam,
+        payload: { lut: lut.texture },
+      });
+    });
+  }, 0);
+
   return store;
 }
 

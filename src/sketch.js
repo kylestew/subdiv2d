@@ -4,6 +4,7 @@ import { luminosity } from "../snod/color";
 import { subdiv } from "./lib/subdiv";
 import { rgbToHex } from "../snod/util";
 import { centroid, area } from "@thi.ng/geom";
+import { applyBrightness, applyContrast } from "../snod/canvas-filters";
 
 function colorDepthDivider(poly, sampler, invert) {
   let color = sampler.colorAt(centroid(poly));
@@ -48,7 +49,7 @@ function createTessedGeometry(width, height, state) {
 }
 
 function render({ ctx, exporting, time, width, height, state }) {
-  const { sampler, enableFill, enableStroke } = state;
+  const { sampler, enableFill, enableStroke, lut } = state;
   if (sampler == undefined) return;
 
   if (!exporting) {
@@ -103,6 +104,15 @@ function render({ ctx, exporting, time, width, height, state }) {
   // draw grid
   ctx.lineJoin = "round";
   polys.map(renderPoly);
+
+  let imgData = ctx.getImageData(0, 0, ctx.canvas.width, ctx.canvas.height);
+  applyBrightness(imgData.data, 10);
+  applyContrast(imgData.data, 20);
+  if (state.lut) {
+    console.log(state.lut);
+    // applyLUT(imgData.data, lut);
+  }
+  ctx.putImageData(imgData, 0, 0);
 }
 
 export { render };
