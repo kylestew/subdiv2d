@@ -1,4 +1,5 @@
 import { createStore } from "redux";
+import parseCubeLUT from "parse-cube-lut";
 import { ImageSampler } from "../snod/sampler";
 import { randomImage } from "./lib/images";
 import { random } from "canvas-sketch-util";
@@ -8,13 +9,19 @@ import {
   buildRandomTessStack,
 } from "./lib/tesses";
 
+// import lutString from "/assets/luts/Everyday_Pro_Color.cube?raw";
+// import lutString from "/assets/luts/GSG_LUT_Cinematic_Desert_Apocolypse.cube?raw";
+import lutString from "/assets/luts/Basic_Contrasty.cube?raw";
+
 function randomState() {
   let willStroke = random.chance(0.2);
 
   return {
     sampler: undefined,
 
-    gridDensity: random.rangeFloor(6, 13),
+    lut: parseCubeLUT(lutString),
+
+    gridDensity: random.rangeFloor(3, 9),
 
     tessStack: buildRandomTessStack(),
 
@@ -34,7 +41,7 @@ function randomState() {
       return tessOptionToName(this.tessStack[3]);
     },
     set tessLevel4(dropped) {},
-    maxDepth: random.rangeFloor(2, 5),
+    maxDepth: random.rangeFloor(1, 3),
     invert: random.boolean(),
 
     enableFill: true,
