@@ -4,7 +4,11 @@ import { luminosity } from "../snod/color";
 import { subdiv } from "./lib/subdiv";
 import { rgbToHex } from "../snod/util";
 import { centroid, area } from "@thi.ng/geom";
-import { applyBrightness, applyContrast } from "../snod/canvas-filters";
+import {
+  applyBrightness,
+  applyContrast,
+  applyLUT,
+} from "../snod/canvas-filters";
 
 function colorDepthDivider(poly, sampler, invert) {
   let color = sampler.colorAt(centroid(poly));
@@ -108,9 +112,8 @@ function render({ ctx, exporting, time, width, height, state }) {
   let imgData = ctx.getImageData(0, 0, ctx.canvas.width, ctx.canvas.height);
   applyBrightness(imgData.data, 10);
   applyContrast(imgData.data, 20);
-  if (state.lut) {
-    console.log(state.lut);
-    // applyLUT(imgData.data, lut);
+  if (lut) {
+    applyLUT(imgData, lut);
   }
   ctx.putImageData(imgData, 0, 0);
 }
