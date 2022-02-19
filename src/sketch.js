@@ -3,7 +3,7 @@ import grids from "../snod/grids";
 import { luminosity } from "../snod/color";
 import { subdiv } from "./lib/subdiv";
 import { rgbToHex } from "../snod/util";
-import { centroid } from "@thi.ng/geom";
+import { centroid, area } from "@thi.ng/geom";
 
 function colorDepthDivider(poly, sampler, invert) {
   let color = sampler.colorAt(centroid(poly));
@@ -16,7 +16,10 @@ function colorDepthDivider(poly, sampler, invert) {
 }
 
 function sampledPolyTint(poly, sampler) {
-  let color = sampler.colorAt(centroid(poly));
+  // base sampling circle in area of poly
+  const rad = Math.max(Math.floor(area(poly) * 0.001), 1);
+  console.log(rad);
+  let color = sampler.averageColorCircle(centroid(poly), rad);
   poly.attribs = {
     fill: rgbToHex(color),
   };
@@ -28,18 +31,20 @@ function createTessedGeometry(width, height, state) {
   let baseGeo = grids.triangle(width, height, parseInt(state.gridDensity));
 
   // tessellate
-  let decisionFn = (poly) =>
-    colorDepthDivider(poly, state.sampler, state.invert);
-  let tessedPolys = subdiv(
-    baseGeo,
-    state.tessStack,
-    decisionFn,
-    state.maxDepth
-  );
+  // let decisionFn = (poly) =>
+  //   colorDepthDivder(poly, state.sampler, state.invert);
+  // let tessedPolys = subdiv(
+  //   baseGeo,
+  //   state.tessStack,
+  //   decisionFn,
+  //   state.maxDepth
+  // );
 
-  // color polys
+  // // color polys
   const polyTintFn = (poly) => sampledPolyTint(poly, state.sampler);
-  return tessedPolys.map(polyTintFn);
+  return baseGeo.map(polyTintFn);
+  // const polyTintFn = (poly) => sampledPolyTint(poly, state.sampler);
+  // return tessedPolys.map(polyTintFn);
 }
 
 function render({ ctx, exporting, time, width, height, state }) {
@@ -70,28 +75,30 @@ function render({ ctx, exporting, time, width, height, state }) {
     });
     ctx.lineTo(p0[0], p0[1]);
 
+    ctx.stroke();
+
     if (enableFill) {
       ctx.fillStyle = poly.attribs.fill;
       ctx.fill();
     }
 
-    if (enableStroke) {
-      ctx.strokeStyle = state.lineColor + componentToHex(state.lineOpacity);
-      ctx.lineWidth = state.lineWidth;
-      ctx.stroke();
-    } else if (enableFill) {
-      // stroke to fill in gaps in polys
-      ctx.strokeStyle = ctx.fillStyle;
-      ctx.lineWidth = 2.5;
-      ctx.stroke();
-    }
+    // if (enableStroke) {
+    //   ctx.strokeStyle = state.lineColor + componentToHex(state.lineOpacity);
+    //   ctx.lineWidth = state.lineWidth;
+    //   ctx.stroke();
+    // } else if (enableFill) {
+    //   // stroke to fill in gaps in polys
+    //   ctx.strokeStyle = ctx.fillStyle;
+    //   ctx.lineWidth = 2.5;
+    //   ctx.stroke();
+    // }
   };
 
   // clip to picture extends (grids will overflow)
   // clip extra to trim errors at edges
-  ctx.beginPath();
-  ctx.rect(2, 2, width - 4, height - 4);
-  ctx.clip();
+  // ctx.beginPath();
+  // ctx.rect(2, 2, width - 4, height - 4);
+  // ctx.clip();
 
   // draw grid
   ctx.lineJoin = "round";

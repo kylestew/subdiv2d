@@ -14,7 +14,8 @@ function randomState() {
   return {
     sampler: undefined,
 
-    gridDensity: random.rangeFloor(6, 13),
+    // gridDensity: random.rangeFloor(6, 13),
+    gridDensity: 12,
 
     tessStack: buildRandomTessStack(),
 

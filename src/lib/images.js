@@ -45,7 +45,8 @@ const defaultImages = [
 ];
 
 function randomImage() {
-  return defaultImages[Math.floor(Math.random() * defaultImages.length)];
+  // return defaultImages[Math.floor(Math.random() * defaultImages.length)];
+  return defaultImages[20];
 }
 
 export { randomImage };
