@@ -19,6 +19,7 @@ import tex17 from "/assets/tex17.jpg";
 import tex18 from "/assets/tex18.jpg";
 import tex19 from "/assets/tex19.jpg";
 import tex20 from "/assets/tex20.jpg";
+import tex21 from "/assets/Orion_Nebula.png";
 
 const defaultImages = [
   tex00,
@@ -42,11 +43,11 @@ const defaultImages = [
   tex18,
   tex19,
   tex20,
+  tex21,
 ];
 
 function randomImage() {
-  // return defaultImages[Math.floor(Math.random() * defaultImages.length)];
-  return defaultImages[20];
+  return defaultImages[Math.floor(Math.random() * defaultImages.length)];
 }
 
 export { randomImage };
