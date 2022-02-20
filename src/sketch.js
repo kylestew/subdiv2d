@@ -1,50 +1,17 @@
 import { transformThatFits, insetRect, componentToHex } from "../snod/util";
 import grids from "../snod/grids";
-import { luminosity } from "../snod/color";
-import { subdiv } from "./lib/subdiv";
 import { rgbToHex } from "../snod/util";
-import { centroid, area } from "@thi.ng/geom";
-import SimplexNoise from "simplex-noise";
+import { subdiv } from "./lib/subdiv";
 import {
   applyBrightness,
   applyContrast,
   applyLUT,
 } from "../snod/canvas-filters";
-
-const simplex = new SimplexNoise();
-
-function colorDepthDivider(poly, sampler, invert) {
-  let color = sampler.colorAt(centroid(poly));
-  let lumi = luminosity(color);
-  // shape luminosity so its more responsive on the low end: [0-1] -> [0-1]
-  if (invert) {
-    return 1.0 - Math.log10(lumi * 9 + 1);
-  }
-  return Math.log10(lumi * 9 + 1);
-}
-
-function tessSelectOnNoiseFn(tessFns, poly, depth) {
-  // tess fn selected based on depth
-  let [x, y] = centroid(poly);
-  let noise = simplex.noise3D(x / 2048, y / 2048, depth) * 0.5 + 0.5;
-  let tessFn = tessFns[Math.floor(noise * tessFns.length)];
-  return tessFn;
-}
-
-function tessSelectByDepthFn(tessFns, poly, depth) {
-  let idx = depth % tessFns.length;
-  return tessFns[idx];
-}
-
-function sampledPolyTint(poly, sampler) {
-  // base sampling circle in area of poly
-  const rad = Math.max(Math.floor(area(poly) * 0.001), 1);
-  let color = sampler.averageColorCircle(centroid(poly), rad);
-  poly.attribs = {
-    fill: rgbToHex(color),
-  };
-  return poly;
-}
+import {
+  colorDepthDivider,
+  tessSelectOnNoiseFn,
+  palettePreferredPolyTintFn,
+} from "./lib/decision-fns";
 
 function createTessedGeometry(width, height, state) {
   // setup base grid geometry
@@ -58,7 +25,7 @@ function createTessedGeometry(width, height, state) {
   let tessedPolys = subdiv(baseGeo, tessSelectFn, decisionFn, state.maxDepth);
 
   // color polys
-  const polyTintFn = (poly) => sampledPolyTint(poly, state.sampler);
+  const polyTintFn = (poly) => palettePreferredPolyTintFn(poly, state.sampler);
   return tessedPolys.map(polyTintFn);
 }
 
@@ -90,8 +57,6 @@ function render({ ctx, exporting, time, width, height, state }) {
     });
     ctx.lineTo(p0[0], p0[1]);
 
-    ctx.stroke();
-
     if (enableFill) {
       ctx.fillStyle = poly.attribs.fill;
       ctx.fill();
@@ -119,13 +84,25 @@ function render({ ctx, exporting, time, width, height, state }) {
   ctx.lineJoin = "round";
   polys.map(renderPoly);
 
-  let imgData = ctx.getImageData(0, 0, ctx.canvas.width, ctx.canvas.height);
-  applyBrightness(imgData.data, 16);
-  applyContrast(imgData.data, 8);
-  if (lut) {
-    applyLUT(imgData, lut);
-  }
-  ctx.putImageData(imgData, 0, 0);
+  // post proc workflow
+  // let imgData = ctx.getImageData(0, 0, ctx.canvas.width, ctx.canvas.height);
+  // applyBrightness(imgData.data, 8);
+  // applyContrast(imgData.data, 8);
+  // if (lut) {
+  // applyLUT(imgData, lut);
+  // }
+  // ctx.putImageData(imgData, 0, 0);
+
+  // TEMP: Display image/palette info
+  // ctx.putImageData(sampler.imageData, 0, 0);
+  // if (sampler.palette) {
+  //   ctx.save();
+  //   for (let i = 0; i < sampler.palette.length; i++) {
+  //     ctx.fillStyle = rgbToHex(sampler.palette[i]);
+  //     ctx.fillRect(20 + i * 110, 20, 100, 100);
+  //   }
+  //   ctx.restore();
+  // }
 }
 
 export { render };
