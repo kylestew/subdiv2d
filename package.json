@@ -42,7 +42,8 @@
     "parse-cube-lut": "^1.0.1",
     "redux": "^4.1.2",
     "simplex-noise": "^3.0.0",
-    "stats.js": "^0.17.0"
+    "stats.js": "^0.17.0",
+    "values.js": "^2.0.0"
   },
   "devDependencies": {
     "vite": "^2.7.0"

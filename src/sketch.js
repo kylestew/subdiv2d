@@ -1,5 +1,6 @@
 import { transformThatFits, insetRect, componentToHex } from "../snod/util";
 import grids from "../snod/grids";
+import { rgbToHex } from "../snod/util";
 import { subdiv } from "./lib/subdiv";
 import {
   applyBrightness,
@@ -9,7 +10,7 @@ import {
 import {
   colorDepthDivider,
   tessSelectOnNoiseFn,
-  sampledPolyTint,
+  palettePreferredPolyTintFn,
 } from "./lib/decision-fns";
 
 function createTessedGeometry(width, height, state) {
@@ -24,34 +25,13 @@ function createTessedGeometry(width, height, state) {
   let tessedPolys = subdiv(baseGeo, tessSelectFn, decisionFn, state.maxDepth);
 
   // color polys
-  const polyTintFn = (poly) => sampledPolyTint(poly, state.sampler);
+  const polyTintFn = (poly) => palettePreferredPolyTintFn(poly, state.sampler);
   return tessedPolys.map(polyTintFn);
 }
 
 function render({ ctx, exporting, time, width, height, state }) {
   const { sampler, enableFill, enableStroke, lut } = state;
   if (sampler == undefined) return;
-
-  // TODO: extract palette from sampler
-  let palette = [];
-  if (sampler.palette) {
-    palette = [
-      sampler.palette.Vibrant.getHex(),
-      sampler.palette.LightVibrant.getHex(),
-      sampler.palette.DarkVibrant.getHex(),
-      sampler.palette.Muted.getHex(),
-      sampler.palette.LightMuted.getHex(),
-      sampler.palette.DarkMuted.getHex(),
-    ];
-  }
-
-  ctx.putImageData(sampler.imageData, 0, 0);
-
-  for (let i = 0; i < palette.length; i++) {
-    ctx.fillStyle = palette[i];
-    ctx.fillRect(20 + i * 110, 20, 100, 100);
-  }
-  palette.forEach((pal) => {});
 
   if (!exporting) {
     // transform canvas to fit image
@@ -66,9 +46,8 @@ function render({ ctx, exporting, time, width, height, state }) {
   }
 
   // do the actual tesselation
-  // const polys = createTessedGeometry(width, height, state);
+  const polys = createTessedGeometry(width, height, state);
 
-  /*
   const renderPoly = (poly) => {
     ctx.beginPath();
     const p0 = poly.points[0];
@@ -77,8 +56,6 @@ function render({ ctx, exporting, time, width, height, state }) {
       ctx.lineTo(p[0], p[1]);
     });
     ctx.lineTo(p0[0], p0[1]);
-
-    ctx.stroke();
 
     if (enableFill) {
       ctx.fillStyle = poly.attribs.fill;
@@ -96,26 +73,36 @@ function render({ ctx, exporting, time, width, height, state }) {
       ctx.stroke();
     }
   };
-  */
 
-  // // clip to picture extends (grids will overflow)
-  // // clip extra to trim errors at edges
-  // ctx.beginPath();
-  // ctx.rect(2, 2, width - 4, height - 4);
-  // ctx.clip();
+  // clip to picture extends (grids will overflow)
+  // clip extra to trim errors at edges
+  ctx.beginPath();
+  ctx.rect(2, 2, width - 4, height - 4);
+  ctx.clip();
 
   // draw grid
-  // ctx.lineJoin = "round";
-  // polys.map(renderPoly);
+  ctx.lineJoin = "round";
+  polys.map(renderPoly);
 
   // post proc workflow
   // let imgData = ctx.getImageData(0, 0, ctx.canvas.width, ctx.canvas.height);
-  // applyBrightness(imgData.data, 16);
+  // applyBrightness(imgData.data, 8);
   // applyContrast(imgData.data, 8);
   // if (lut) {
-  //   applyLUT(imgData, lut);
+  // applyLUT(imgData, lut);
   // }
   // ctx.putImageData(imgData, 0, 0);
+
+  // TEMP: Display image/palette info
+  // ctx.putImageData(sampler.imageData, 0, 0);
+  // if (sampler.palette) {
+  //   ctx.save();
+  //   for (let i = 0; i < sampler.palette.length; i++) {
+  //     ctx.fillStyle = rgbToHex(sampler.palette[i]);
+  //     ctx.fillRect(20 + i * 110, 20, 100, 100);
+  //   }
+  //   ctx.restore();
+  // }
 }
 
 export { render };

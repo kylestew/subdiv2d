@@ -39,9 +39,42 @@ function sampledPolyTint(poly, sampler) {
   return poly;
 }
 
+function colorDistance(a, b) {
+  return (
+    (b[0] - a[0]) * (b[0] - a[0]) +
+    (b[1] - a[1]) * (b[1] - a[1]) +
+    (b[2] - a[2]) * (b[2] - a[2])
+  );
+}
+
+function palettePreferredPolyTintFn(poly, sampler) {
+  // base sampling circle in area of poly
+  const rad = Math.min(Math.max(Math.floor(area(poly) * 0.001), 1), 16);
+  let sampledColor = sampler.averageColorCircle(centroid(poly), rad);
+
+  // find color in palette nearest to sampled color
+  if (sampler.palette) {
+    let sorted = [...sampler.palette].sort((a, b) => {
+      return colorDistance(a, sampledColor) - colorDistance(b, sampledColor);
+    });
+    let color = sorted[0];
+
+    poly.attribs = {
+      fill: rgbToHex(color),
+    };
+  } else {
+    poly.attribs = {
+      fill: rgbToHex(sampledColor),
+    };
+  }
+
+  return poly;
+}
+
 export {
   colorDepthDivider,
   tessSelectOnNoiseFn,
   tessSelectByDepthFn,
   sampledPolyTint,
+  palettePreferredPolyTintFn,
 };

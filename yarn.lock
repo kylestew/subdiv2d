@@ -592,6 +592,11 @@ color-luminance@^2.1.0:
   resolved "https://registry.yarnpkg.com/color-luminance/-/color-luminance-2.1.0.tgz#58ff2ebd32b52d07f5378eefe5a0e79d6b318ad7"
   integrity sha1-WP8uvTK1LQf1N47v5aDnnWsxitc=
 
+color-name@^1.1.4:
+  version "1.1.4"
+  resolved "https://registry.yarnpkg.com/color-name/-/color-name-1.1.4.tgz#c2a09a87acbde69543de6f63fa3995c826c536a2"
+  integrity sha512-dOy+3AuW3a2wNbZHIuMZpTcgjGuLU/uBL/ubcZF9OXbDo8ff4O8yVp5Bf0efS8uEoYo5q4Fx7dY9OgQGXgAsQA==
+
 convert-length@^1.0.1:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/convert-length/-/convert-length-1.0.1.tgz#b66c7dc1f7d181916667c977f57be2f1eb17c1b7"
@@ -804,6 +809,11 @@ has@^1.0.3:
   dependencies:
     function-bind "^1.1.1"
 
+hex-rgb@^4.1.0:
+  version "4.3.0"
+  resolved "https://registry.yarnpkg.com/hex-rgb/-/hex-rgb-4.3.0.tgz#af5e974e83bb2fefe44d55182b004ec818c07776"
+  integrity sha512-Ox1pJVrDCyGHMG9CFg1tmrRUMRPRsAWYc/PinY0XzJU4K7y7vjNoLKIQ7BR5UJMCxNN8EM1MNDmHWA/B3aZUuw==
+
 ieee754@^1.1.13:
   version "1.2.1"
   resolved "https://registry.yarnpkg.com/ieee754/-/ieee754-1.2.1.tgz#8eb7a10a63fff25d15a57b001586d177d1b0d352"
@@ -881,6 +891,14 @@ minimist@^1.2.5:
   version "1.2.5"
   resolved "https://registry.yarnpkg.com/minimist/-/minimist-1.2.5.tgz#67d66014b66a6a8aaa0c083c5fd58df4e4e97602"
   integrity sha512-FM9nNUYrRBAELZQT3xeZQ7fmMOBg6nWNmJKTcgsJeaLstP/UODVpGsr5OhXhhXg6f+qtJ8uiZ+PUxkDWcgIXLw==
+
+mix-css-color@^0.1.1:
+  version "0.1.1"
+  resolved "https://registry.yarnpkg.com/mix-css-color/-/mix-css-color-0.1.1.tgz#25d326285013221b01c7b47665a5a0f8d2b924af"
+  integrity sha512-eCBDEx5zyUD7g7fV+IwTYNh6SU0hP0ACxO/eVag20YQgHC4JY/iRrh6ofdYzDLc09h2TvXikJdg24F91EI0ofw==
+  dependencies:
+    parse-css-color "^0.1.2"
+    pure-color "^1.3.0"
 
 mkdirp@^0.5.1:
   version "0.5.5"
@@ -974,6 +992,14 @@ parse-color@^1.0.0:
   dependencies:
     color-convert "~0.5.0"
 
+parse-css-color@^0.1.2:
+  version "0.1.2"
+  resolved "https://registry.yarnpkg.com/parse-css-color/-/parse-css-color-0.1.2.tgz#9d178f2d2b5eb7245c0deb22ea35046b79ff3f83"
+  integrity sha512-z7v/tf0edGsnlm9VONQtH+u/YVrdUqZXrSBzqM13scef8Abl2VyZfYsZaJoyb/AyY4SIxtoJChSQ4MURHfY3Sg==
+  dependencies:
+    color-name "^1.1.4"
+    hex-rgb "^4.1.0"
+
 parse-cube-lut@^1.0.1:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/parse-cube-lut/-/parse-cube-lut-1.0.1.tgz#5399036ec7becc74110a535a92384f1d2ec24307"
@@ -1039,6 +1065,11 @@ punycode@1.3.2:
   version "1.3.2"
   resolved "https://registry.yarnpkg.com/punycode/-/punycode-1.3.2.tgz#9653a036fb7c1ee42342f2325cceefea3926c48d"
   integrity sha1-llOgNvt8HuQjQvIyXM7v6jkmxI0=
+
+pure-color@^1.3.0:
+  version "1.3.0"
+  resolved "https://registry.yarnpkg.com/pure-color/-/pure-color-1.3.0.tgz#1fe064fb0ac851f0de61320a8bf796836422f33e"
+  integrity sha1-H+Bk+wrIUfDeYTIKi/eWg2Qi8z4=
 
 querystring@0.2.0:
   version "0.2.0"
@@ -1162,6 +1193,15 @@ utif@^2.0.1:
   integrity sha512-Z/S1fNKCicQTf375lIP9G8Sa1H/phcysstNrrSdZKj1f9g58J4NMgb5IgiEZN9/nLMPDwF0W7hdOe9Qq2IYoLg==
   dependencies:
     pako "^1.0.5"
+
+values.js@^2.0.0:
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/values.js/-/values.js-2.0.0.tgz#c09826ef45acbdd58c080fb5440ea669b3c3729a"
+  integrity sha512-jTkNoKe//KpHr+P7XR99N95uu4/3tFAylin4kCBW+a0TULj2RI7L6yTjFy/mel8w462vvdSTZYPXqZ4DkT3AHQ==
+  dependencies:
+    mix-css-color "^0.1.1"
+    parse-css-color "^0.1.2"
+    pure-color "^1.3.0"
 
 vec2-copy@^1.0.0:
   version "1.0.0"
