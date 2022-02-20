@@ -1,50 +1,16 @@
 import { transformThatFits, insetRect, componentToHex } from "../snod/util";
 import grids from "../snod/grids";
-import { luminosity } from "../snod/color";
 import { subdiv } from "./lib/subdiv";
-import { rgbToHex } from "../snod/util";
-import { centroid, area } from "@thi.ng/geom";
-import SimplexNoise from "simplex-noise";
 import {
   applyBrightness,
   applyContrast,
   applyLUT,
 } from "../snod/canvas-filters";
-
-const simplex = new SimplexNoise();
-
-function colorDepthDivider(poly, sampler, invert) {
-  let color = sampler.colorAt(centroid(poly));
-  let lumi = luminosity(color);
-  // shape luminosity so its more responsive on the low end: [0-1] -> [0-1]
-  if (invert) {
-    return 1.0 - Math.log10(lumi * 9 + 1);
-  }
-  return Math.log10(lumi * 9 + 1);
-}
-
-function tessSelectOnNoiseFn(tessFns, poly, depth) {
-  // tess fn selected based on depth
-  let [x, y] = centroid(poly);
-  let noise = simplex.noise3D(x / 2048, y / 2048, depth) * 0.5 + 0.5;
-  let tessFn = tessFns[Math.floor(noise * tessFns.length)];
-  return tessFn;
-}
-
-function tessSelectByDepthFn(tessFns, poly, depth) {
-  let idx = depth % tessFns.length;
-  return tessFns[idx];
-}
-
-function sampledPolyTint(poly, sampler) {
-  // base sampling circle in area of poly
-  const rad = Math.max(Math.floor(area(poly) * 0.001), 1);
-  let color = sampler.averageColorCircle(centroid(poly), rad);
-  poly.attribs = {
-    fill: rgbToHex(color),
-  };
-  return poly;
-}
+import {
+  colorDepthDivider,
+  tessSelectOnNoiseFn,
+  sampledPolyTint,
+} from "./lib/decision-fns";
 
 function createTessedGeometry(width, height, state) {
   // setup base grid geometry
@@ -66,6 +32,27 @@ function render({ ctx, exporting, time, width, height, state }) {
   const { sampler, enableFill, enableStroke, lut } = state;
   if (sampler == undefined) return;
 
+  // TODO: extract palette from sampler
+  let palette = [];
+  if (sampler.palette) {
+    palette = [
+      sampler.palette.Vibrant.getHex(),
+      sampler.palette.LightVibrant.getHex(),
+      sampler.palette.DarkVibrant.getHex(),
+      sampler.palette.Muted.getHex(),
+      sampler.palette.LightMuted.getHex(),
+      sampler.palette.DarkMuted.getHex(),
+    ];
+  }
+
+  ctx.putImageData(sampler.imageData, 0, 0);
+
+  for (let i = 0; i < palette.length; i++) {
+    ctx.fillStyle = palette[i];
+    ctx.fillRect(20 + i * 110, 20, 100, 100);
+  }
+  palette.forEach((pal) => {});
+
   if (!exporting) {
     // transform canvas to fit image
     let trans = transformThatFits(
@@ -79,8 +66,9 @@ function render({ ctx, exporting, time, width, height, state }) {
   }
 
   // do the actual tesselation
-  const polys = createTessedGeometry(width, height, state);
+  // const polys = createTessedGeometry(width, height, state);
 
+  /*
   const renderPoly = (poly) => {
     ctx.beginPath();
     const p0 = poly.points[0];
@@ -108,24 +96,26 @@ function render({ ctx, exporting, time, width, height, state }) {
       ctx.stroke();
     }
   };
+  */
 
-  // clip to picture extends (grids will overflow)
-  // clip extra to trim errors at edges
-  ctx.beginPath();
-  ctx.rect(2, 2, width - 4, height - 4);
-  ctx.clip();
+  // // clip to picture extends (grids will overflow)
+  // // clip extra to trim errors at edges
+  // ctx.beginPath();
+  // ctx.rect(2, 2, width - 4, height - 4);
+  // ctx.clip();
 
   // draw grid
-  ctx.lineJoin = "round";
-  polys.map(renderPoly);
+  // ctx.lineJoin = "round";
+  // polys.map(renderPoly);
 
-  let imgData = ctx.getImageData(0, 0, ctx.canvas.width, ctx.canvas.height);
-  applyBrightness(imgData.data, 16);
-  applyContrast(imgData.data, 8);
-  if (lut) {
-    applyLUT(imgData, lut);
-  }
-  ctx.putImageData(imgData, 0, 0);
+  // post proc workflow
+  // let imgData = ctx.getImageData(0, 0, ctx.canvas.width, ctx.canvas.height);
+  // applyBrightness(imgData.data, 16);
+  // applyContrast(imgData.data, 8);
+  // if (lut) {
+  //   applyLUT(imgData, lut);
+  // }
+  // ctx.putImageData(imgData, 0, 0);
 }
 
 export { render };

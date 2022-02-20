@@ -83,12 +83,16 @@ function appReducer(state = randomState(), action) {
 }
 
 function replaceSamplerFromUrl(url, store) {
-  ImageSampler.CreateFromImageUrl(url, (sampler) => {
-    store.dispatch({
-      type: AppActions.ReplaceSampler,
-      payload: sampler,
-    });
-  });
+  ImageSampler.CreateFromImageUrl(
+    url,
+    (sampler) => {
+      store.dispatch({
+        type: AppActions.ReplaceSampler,
+        payload: sampler,
+      });
+    },
+    true
+  );
 }
 
 function createApp() {
